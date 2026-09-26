@@ -74,6 +74,9 @@ class Courier():
 
     #относится к дополнительному заданию
     @allure.step('Отправка запроса на удаление')
-    def delete_courier(self):
+    def delete_courier(self, payload):
+        self.delete_response = requests.delete(Constants.DELETE_COURIER_URL.format(payload))
+
+    @allure.step('Сохранение id курьера')
+    def set_courier_id(self):
         self.courier_id = self.login_response.json()['id']
-        self.delete_response = requests.delete(Constants.DELETE_COURIER_URL.format(self.courier_id))

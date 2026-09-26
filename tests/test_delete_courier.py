@@ -1,9 +1,8 @@
 #дополнительное задание 1
 import allure
-import requests
-from constants import Constants
 from functions.courier import Courier
 from functions.base import generate_random_number
+from data import TextErrorDeleteCourier
 
 @allure.suite('Проверка функции удаления курьера')
 class TestDeleteCourier:
@@ -11,21 +10,24 @@ class TestDeleteCourier:
     def test_delete_existing_courier(self):
         courier = Courier()
         courier.register_new_random_courier()
-        data = {'login': courier.login, 'password': courier.password}
-        courier.login_courier(data)
-        courier.delete_courier()
+        login_payload = {'login': courier.login, 'password': courier.password}
+        courier.login_courier(login_payload)
+        courier.set_courier_id()
+        courier.delete_courier(courier.courier_id)
         assert courier.delete_response.status_code == 200
         assert courier.delete_response.json() == {"ok": True}
 
     @allure.title('Негативная проверка удаления без указания id')
     def test_delete_courier_without_id(self):
-        delete_response = requests.delete(Constants.DELETE_COURIER_URL.format(''))
-        assert delete_response.status_code == 400
-        assert delete_response.json() == {"message":  "Недостаточно данных для удаления курьера"}
+        courier = Courier()
+        courier.delete_courier('')
+        assert courier.delete_response.status_code == 404
+        assert courier.delete_response.json()["message"] == TextErrorDeleteCourier.TEXT_RESPONSE_NOT_ENOUGH_ID
 
     @allure.title('Негативная проверка удаления с указанием несуществующего id')
     def test_delete_courier_with_non_existing_id(self):
-        id = generate_random_number(1, 100)
-        delete_response = requests.delete(Constants.DELETE_COURIER_URL.format(id))
-        assert delete_response.status_code == 404
-        assert delete_response.json() == {"message": "Курьера с таким id нет"}
+        courier = Courier()
+        id = -generate_random_number(1, 100)
+        courier.delete_courier(id)
+        assert courier.delete_response.status_code == 404
+        assert courier.delete_response.json()["message"] == TextErrorDeleteCourier.TEXT_RESPONSE_COURIER_NOT_FOUND

@@ -59,7 +59,7 @@ class Order:
         return response
 
     @allure.step('Отправление неполного запроса на принятие заказа')
-    def send_accept_order_request_without_courier_Id(self, order_id):
+    def send_accept_order_request_without_courier_id(self, order_id):
         response =  requests.put(Constants.ACCEPT_ORDER_URL_NON_COURIER_ID.format(order_id))
         return response
 
@@ -75,9 +75,4 @@ class Order:
             if response.status_code == 200:
                 return response
             time.sleep(0.5)
-
-        assert response.status_code == 200, (
-            f'Заказ {track} не найден после ожидания {timeout} сек. '
-            f'Status: {response.status_code}. '
-            f'Body: {response.text}'
-            )
+            

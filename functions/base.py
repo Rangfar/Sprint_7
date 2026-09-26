@@ -1,6 +1,5 @@
 import random
 import string
-import requests
 
 def generate_random_string(length):
     letters = string.ascii_lowercase
